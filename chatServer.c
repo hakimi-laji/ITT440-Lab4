@@ -1,3 +1,5 @@
+/* Code unfinished. Not working. Will try later. */
+
 #include <stdio.h> 
 #include <netdb.h> 
 #include <netinet/in.h> 
