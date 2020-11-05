@@ -1,68 +1,105 @@
-//TCP server
-#include<arpa/inet.h>
-#include<sys/socket.h>
-#include<stdio.h>
-#include<string.h>
-#include<netdb.h>
-#include<stdlib.h>
-int main()
-{
-	char buf[100];
-	int k;
-	socklen_t len;
-	int sock_desc,temp_sock_desc;
-	struct sockaddr_in server,client;
-	memset(&server,0,sizeof(server));
-	memset(&client,0,sizeof(client));
-	sock_desc=socket(AF_INET,SOCK_STREAM,0);
-	if(sock_desc==-1)
-	{
-		printf("Error in socket creation");
-		exit(1);
-	}
-	server.sin_family=AF_INET;
-	server.sin_addr.s_addr=inet_addr("127.0.0.1");
-	server.sin_port=3002;
-	k=bind(sock_desc,(struct sockaddr*)&server,sizeof(server));
-	if(k==-1){
-		printf("Error in binding");
-		exit(1);
-	}
-	k=listen(sock_desc,20);
-	if(k==-1)
-	{
-		printf("Error in listening");
-		exit(1);
-	}
-	len=sizeof(client);//VERY IMPORTANT
+/*
+	Simple chat application using TCP Server-Client for Linux
+	Written and modified by Hakimi Laji (https://github.com/hakimi-laji)
+	Based on code from https://www.geeksforgeeks.org/tcp-server-client-implementation-in-c/
 	
-	temp_sock_desc=accept(sock_desc,(struct sockaddr*)&client,&len);//VERY //IMPORTANT
-	if(temp_sock_desc==-1)
-	{
-		printf("Error in temporary socket creation");
-		exit(1);
+	This code is for SERVER host.
+*/
+
+#include<unistd.h>
+#include<arpa/inet.h>
+#include <stdio.h> 
+#include <netdb.h> 
+#include <netinet/in.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <sys/socket.h> 
+#include <sys/types.h> 
+
+// Function designed for chat between client and server. 
+void func(int sockfd) 
+{ 
+	char buff[80]; 
+	int n; 
+	
+	// infinite loop for chat 
+	for (;;) { 
+		bzero(buff, 80); 
+
+		// read the messtruct sockaddrge from client and copy it in buffer 
+		read(sockfd, buff, sizeof(buff)); 
+		// print buffer which contains the client contents 
+		printf("Client: %sYOU   : ", buff); 
+		bzero(buff, 80); 
+		n = 0; 
+		// copy server messtruct sockaddrge in the buffer 
+		while ((buff[n++] = getchar()) != '\n') 
+			; 
+
+		// and send that buffer to client 
+		write(sockfd, buff, sizeof(buff)); 
+
+		// if msg contains "Exit" then server exit and chat ended. 
+		if (strncmp("exit", buff, 4) == 0) { 
+			printf("\nServer Exiting...\n"); 
+			printf("----------CHAT----------\n\n"); 
+			break; 
+		} 
+	} 
+} 
+
+// Driver function 
+int main() 
+{ 
+	int sockfd, connfd, len; 
+	struct sockaddr_in servaddr, cli; 
+
+	// socket create and verification 
+	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+	if (sockfd == -1) { 
+		printf("Socket creation failed.\n"); 
+		exit(0); 
+	} 
+	else
+		printf("Socket successfully created.\n"); 
+	bzero(&servaddr, sizeof(servaddr)); 
+
+	// assign IP, PORT 
+	servaddr.sin_family = AF_INET; 
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+	servaddr.sin_port = htons(8888); 
+
+	// Binding newly created socket to given IP and verification 
+	if ((bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))) != 0) { 
+		printf("Socket bind failed.\n"); 
+		exit(0); 
+	} 
+	else
+		printf("Socket successfully binded.\n"); 
+
+	// Now server is ready to listen and verification 
+	if ((listen(sockfd, 5)) != 0) { 
+		printf("Listen failed.\n"); 
+		exit(0); 
+	} 
+	else
+		printf("Server listening...\n"); 
+	len = sizeof(cli); 
+
+	// Accept the data packet from client and verification 
+	connfd = accept(sockfd, (struct sockaddr*)&cli, &len); 
+	if (connfd < 0) { 
+		printf("Server acccept failed.\n"); 
+		exit(0); 
+	} 
+	else {
+		printf("Server acccepted a client. Send a response message to start a chat.\n");
+		printf("Type [exit] to close the server and chat. \n\n----------CHAT----------\n"); 
 	}
-	while(1)
-	{
-		k=recv(temp_sock_desc,buf,100,0);
-		if(k==-1)
-		{
-			printf("Error in receiving");
-			exit(1);
-		}
-		printf("Message got from client is : %s",buf);
-		printf("\nEnter data to be send to client: ");
-		fgets(buf,100,stdin);
-		if(strncmp(buf,"end",3)==0)
-		break;
-		k=send(temp_sock_desc,buf,100,0);
-		if(k==-1)
-		{
-			printf("Error in sending");
-			exit(1);
-		}
-	}
-	close(temp_sock_desc); 
-	exit(0);
-	return 0;
-}
+
+	// Function for chatting between client and server 
+	func(connfd); 
+
+	// After chatting close the socket 
+	close(sockfd); 
+} 
