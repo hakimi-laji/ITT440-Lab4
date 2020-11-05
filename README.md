@@ -3,8 +3,9 @@ Socket programming in C
 
 CHAT PROGRAM
 ************
-chatServer.c
-chatClient.c
+-chatServer.c
+-chatClient.c
+************
 
 WHAT IS IT?
 A simple program that uses TCP connection and sockets to establish a 2-way text-based communication between Server and Client.
