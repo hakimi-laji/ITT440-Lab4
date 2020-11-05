@@ -76,6 +76,11 @@ int main()
 	} 
 	else
 		printf("Socket successfully binded.\n"); 
+	
+		/* About socket binding: 
+		This program may be having a hard time performing this process.
+		Just leave it for a few seconds and try again, then it will work. Reasons unknown. */
+	
 
 	// Now server is ready to listen and verification 
 	if ((listen(sockfd, 5)) != 0) { 
