@@ -31,3 +31,4 @@ int main(int argc , char *argv[])
 	printf("%s resolved to : %s \n" , hostname , ip);
 	return 0;
 }
+
