@@ -3,8 +3,9 @@ Socket programming in C
 
 CHAT PROGRAM
 ************
--chatServer.c
--chatClient.c
+chatServer.c
+
+chatClient.c
 ************
 
 WHAT IS IT?
@@ -12,8 +13,8 @@ A simple program that uses TCP connection and sockets to establish a 2-way text-
 
 HOW TO USE?
 1. Configure static ip address on both server and client hosts
-2. Compile and run chatServer.c
-4. Compile and run chatClient.c
+2. Compile and run *chatServer.c*
+4. Compile and run *chatClient.c*
 5. Input the IP address of the server
 6. The server host has to send a response or type [exit] to cut off the connection
 7. The client host can now reply
